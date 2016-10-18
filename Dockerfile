@@ -5,7 +5,7 @@ ENV ENAML /opt/enaml
 ENV GOPATH /opt/go
 ENV GOBIN /opt/go/bin
 ENV OMGBIN /usr/local/bin
-ENV PATH $GOBIN:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/bin
+ENV PATH $GOBIN:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$HOME/bin:/opt/google-cloud-sdk/bin
 ENV HOME /root
 
 ADD update_enaml.sh /usr/local/bin
@@ -15,13 +15,23 @@ VOLUME $HOME
 WORKDIR $HOME
 RUN mkdir -p $HOME/bin
 
+RUN echo "http://alpine.gliderlabs.com/alpine/edge/main" > /etc/apk/repositories
+RUN echo "http://alpine.gliderlabs.com/alpine/edge/testing" >> /etc/apk/repositories
+RUN echo "http://alpine.gliderlabs.com/alpine/v3.4/main" >> /etc/apk/repositories
+RUN echo "http://alpine.gliderlabs.com/alpine/v3.4/community" >> /etc/apk/repositories
+RUN apk update && apk upgrade
 RUN apk-install bash go bzr git mercurial subversion openssh-client \
-    ca-certificates wget curl jq ruby nodejs python3 iperf screen tmux \
-    file tcpdump py-pip libcrypto1.0 ruby-dev ruby-bundler nmap perl
+    ca-certificates wget curl jq ruby nodejs python2 iperf screen tmux \
+    file tcpdump py-pip libcrypto1.0 ruby-dev ruby-bundler nmap perl \
+    drill iproute2 iputils git-bash-completion bash-completion build-base \
+    python2-dev linux-headers
 
 # BOSH-related tools
-# Installs BOSH CLI
+# BOSH CLI
 RUN gem install bosh_cli --no-ri --no-rdoc
+
+# uaac CLI
+RUN gem install cf-uaac --no-rdoc --no-ri
 
 # Installs the new Golang BOSH CLI (alpha)
 RUN go get -u github.com/cloudfoundry/bosh-cli
@@ -29,7 +39,7 @@ RUN go get -u github.com/cloudfoundry/bosh-cli
 # Builds and installs bosh-init
 RUN go get -u github.com/cloudfoundry/bosh-init
 
-# Builds and installs bosh-bootloader
+# bosh-bootloader
 RUN curl -L "https://github.com/cloudfoundry/bosh-bootloader/releases/download/v1.0.0/bbl-v1.0.0_linux_x86-64" > /usr/local/bin/bbl && chmod +x /usr/local/bin/bbl
 
 # Spiff
@@ -61,13 +71,11 @@ RUN cd /usr/local/bin && wget -q -O asg-creator \
 # Pivotal-specific tools
 
 # cf-mgmt CLI
-RUN cd /usr/local/bin && wget -q -O cf-mgmt \
-    "$(curl -s https://api.github.com/repos/pivotalservices/cf-mgmt/releases/latest \
-    |jq --raw-output '.assets[] | .browser_download_url' | grep linux | grep -v zip)" && chmod +x cf-mgmt
+RUN go get github.com/pivotalservices/cf-mgmt
 
 # PivNet CLI
 RUN wget -q -O /usr/local/bin/pivnet \
-    "$(curl -s https://api.github.com/repos/pivotal-cf/go-pivnet/releases/latest \
+    "$(curl -s https://api.github.com/repos/pivotal-cf/pivnet-cli/releases/latest \
     |jq --raw-output '.assets[] | .browser_download_url' | grep linux | grep -v zip)" && \
     chmod +x /usr/local/bin/pivnet
 
@@ -94,11 +102,15 @@ RUN wget $(wget -O- -q https://www.vaultproject.io/downloads.html | grep linux_a
 
 # IaaS tools
 
+# OpenStack CLI
+RUN pip install python-openstackclient
+
 # AWS CLI
 RUN pip install awscli
 
 # Azure CLI
 RUN npm install -g azure-cli
+
 
 # Google Compute
 RUN curl -L "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-130.0.0-linux-x86_64.tar.gz" | tar -C /opt -zx && /opt/google-cloud-sdk/install.sh -q
@@ -120,8 +132,12 @@ RUN go get -u github.com/starkandwayne/safe
 RUN curl "https://raw.githubusercontent.com/starkandwayne/genesis/master/bin/genesis" > /usr/local/bin/genesis \
     && chmod 0755 /usr/local/bin/genesis
 
+# s3cmd
+RUN pip install s3cmd
+
 # Cleanup
 RUN rm -rf $GOPATH/src $GOPATH/pkg
 RUN rm -rf /tmp/*
+RUN apk del ruby-dev ruby-bundler build-base python2-dev linux-headers libcrypto1.0
 
 CMD ["/bin/bash"]

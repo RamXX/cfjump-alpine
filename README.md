@@ -1,23 +1,23 @@
 # cfjump
 
-Re-implementation of cfjump on Alpine Linux with the purpose of reduce its size.
-**This is a work in progress and may not work at all as it is**
+Re-implementation of [cfjump](https://github.com/RamXX/cfjump) on Alpine Linux with the purpose of reduce its size. 
 
-Jumpbox Docker image with most of the required tools to install and operate Cloud Foundry from the command line. It works with different workflows, including [Enaml](http://enaml.pezapp.io/) and others, and includes several tools to work with OpsManager and other Pivotal-specific components. It also includes some IaaS-specific CLI tools for AWS, GCP, and Azure.
+Jumpbox Docker image with most of the required tools to install and operate Cloud Foundry from the command line. It works with different workflows, and includes several tools to work with OpsManager and other Pivotal-specific components. It also includes some IaaS-specific CLI tools for OpenStack, AWS, GCP, and Azure.
 
 It has been tested only on an Ubuntu Server 16.04 (Xenial) 64-bit Docker host VM. Your mileage on other systems may vary.
 
-v0.1 includes:
+v0.2 includes:
 
 ##### Linux
 - gliderlabs/alpine base image
 - Several Linux troubleshooting tools like `iPerf`, `nmap` and `tcpdump`.
-- Golang (1.7.1)
+- Golang (1.6)
 
 ##### Cloud Foundry tools
 - `bosh-init` (latest)
 - [BOSH](http://bosh.io/) CLI (latest)
 - `cf` CLI (latest)
+- [uaac](https://docs.cloudfoundry.org/adminguide/uaa-user-management.html) CLI
 - [Concourse](http://concourse.ci/) `fly` CLI (latest)
 - [asg-creator](https://github.com/cloudfoundry-incubator/asg-creator) (latest) A cleaner way to create and manage ASGs.
 - [Deployadactyl](https://github.com/compozed/deployadactyl) (latest). Go library for deploying applications to multiple Cloud Foundry instances.
@@ -30,6 +30,7 @@ v0.1 includes:
 - [bosh-bootloader](https://github.com/cloudfoundry/bosh-bootloader) Command line utility for standing up a CloudFoundry or Concourse installation on an IAAS of your choice.
 
 ##### IaaS tools
+- [OpenStack CLI](http://docs.openstack.org/developer/python-openstackclient/man/openstack.html) (latest), both, legacy `nova`, `cinder`, `keystone`, etc commands as well as the newer `openstack` integrated CLI.
 - [Terraform](https://www.terraform.io/) (0.7.4)
 - [Microsoft Azure CLI](https://github.com/Azure/azure-xplat-cli) (latest)
 - [Google Compute Cloud CLI](https://cloud.google.com/sdk/downloads#linux) (latest)
@@ -42,13 +43,12 @@ v0.1 includes:
 - [Spiff](https://github.com/cloudfoundry-incubator/spiff) (latest)
 - [Spruce](http://spruce.cf/) (latest)
 - [Genesis](https://github.com/starkandwayne/genesis) (latest)
+- [s3cmd](http://s3tools.org/s3cmd) (latest). Command line to work with S3 endpoints.
 
 
 ##### Currently **NOT** working
-- [uaac](https://docs.cloudfoundry.org/adminguide/uaa-user-management.html) CLI
 - [Enaml](http://enaml.pezapp.io/) (update program only). Deploy Cloud Foundry without YAML.
-- [Photon Controller](https://github.com/vmware/photon-controller) CLI (latest)
-- OpenStack CLI (latest), both, legacy `nova`, `cinder`, `keystone`, etc commands as well as the newer `openstack` integrated CLI.
+- [Photon Controller](https://github.com/vmware/photon-controller) CLI 
 
 ## Running
 First, make sure you can run instances as a regular unprivileged user. This container will create an internal user with uid and gid of 1000, same as the default in Ubuntu, which makes easier to share folders with the host.
