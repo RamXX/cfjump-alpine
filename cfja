@@ -1,14 +1,14 @@
 #!/bin/bash
 
 list_env(){
-    docker ps -a --format="{{.Names}}" | grep "cfj-" | sed 's/cfj-//g'
+    docker ps -a --format="{{.Names}}" | grep "cfja-" | sed 's/cfja-//g'
 }
 
 kill_env(){
   env=$(basename "$1")
-  if [ ! -z "$(docker ps -a | grep "cfj-$env")" ]; then
-    docker stop "cfj-$env" 2>&1 > /dev/null
-    echo $(docker rm "cfj-$env" | sed 's/cfj-//g') killed
+  if [ ! -z "$(docker ps -a | grep "cfja-$env")" ]; then
+    docker stop "cfja-$env" 2>&1 > /dev/null
+    echo $(docker rm "cfja-$env" | sed 's/cfja-//g') killed
   else
     echo "Environment $env doesn't exist"
     exit 2
@@ -17,17 +17,17 @@ kill_env(){
 
 enter_env(){
   if [ ! -z "$(docker ps -a | grep "$env")" ]; then
-    docker start -ai "cfj-$env"
+    docker start -ai "cfja-$env"
   else
     cd $HOME
     mkdir -p "$env" && touch $env/.touchfile
     echo "export PS1=\"$env \$ \"" >> $env/.bashrc
-    docker run --name="cfj-$env" -it -v $HOME/"$env":/home/ops ramxx/cfjump /bin/bash
+    docker run --name="cfja-$env" -it -v $HOME/"$env":/root ramxx/cfjump-alpine /bin/bash
   fi
 }
 
 usage(){
-    echo "usage: cfj <env-name> | list | kill [ <env-name> | all ]"
+    echo "usage: cfja <env-name> | list | kill [ <env-name> | all ]"
     exit 1
 }
 
