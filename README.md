@@ -1,6 +1,6 @@
 # cfjump
 
-Re-implementation of [cfjump](https://github.com/RamXX/cfjump) on Alpine Linux with the purpose of reduce its size. 
+Re-implementation of [cfjump](https://github.com/RamXX/cfjump) on Alpine Linux with the purpose of reduce its size.
 
 Jumpbox Docker image with most of the required tools to install and operate Cloud Foundry from the command line. It works with different workflows, and includes several tools to work with OpsManager and other Pivotal-specific components. It also includes some IaaS-specific CLI tools for OpenStack, AWS, GCP, and Azure.
 
@@ -16,6 +16,7 @@ v0.2 includes:
 ##### Cloud Foundry tools
 - `bosh-init` (latest)
 - [BOSH](http://bosh.io/) CLI (latest)
+- [`bosh-cli`](https://github.com/cloudfoundry/bosh-cli) (latest) Golang implementation of the BOSH CLI. Early Alpha.
 - `cf` CLI (latest)
 - [uaac](https://docs.cloudfoundry.org/adminguide/uaa-user-management.html) CLI
 - [Concourse](http://concourse.ci/) `fly` CLI (latest)
@@ -48,17 +49,17 @@ v0.2 includes:
 
 ##### Currently **NOT** working
 - [Enaml](http://enaml.pezapp.io/) (update program only). Deploy Cloud Foundry without YAML.
-- [Photon Controller](https://github.com/vmware/photon-controller) CLI 
+- [Photon Controller](https://github.com/vmware/photon-controller) CLI
 
 ## Running
 First, make sure you can run instances as a regular unprivileged user. This container will create an internal user with uid and gid of 1000, same as the default in Ubuntu, which makes easier to share folders with the host.
 
-The included `cfj` script make the operation of virtual jumpboxes easy. Copy it to a directory in your $PATH and use it to interact with the virtual jumpboxes. The operation is:
+The included `cfja` script make the operation of virtual jumpboxes easy. Copy it to a directory in your $PATH and use it to interact with the virtual jumpboxes. The operation is:
 
-- `cfj list` (or simply `cfj` with no arguments) to list the running containers.
-- `cfj <name>` to either create or enter a container.
-- `cfj kill <name>` to delete a running container. **The associated shared volume
-won't be deleted**. That needs to be done manually if desired. You can also specify `cfj kill all`, which will destroy all running (or stopped) jumpbox containers.
+- `cfja list` (or simply `cfja` with no arguments) to list the running containers.
+- `cfja <name>` to either create or enter a container.
+- `cfja kill <name>` to delete a running container. **The associated shared volume
+won't be deleted**. That needs to be done manually if desired. You can also specify `cfja kill all`, which will destroy all running (or stopped) jumpbox containers.
 
 You can use different jumpbox instances for different sessions, users, environments, etc, as long as you use different shared folders.
 
